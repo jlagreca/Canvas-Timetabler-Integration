@@ -9,7 +9,7 @@ require 'json'
 require 'unirest'
 require 'zip'
 
-
+#you need to have folders for archive, data, csv, student and upload
 
 #some variables to make it do stuff and things
 basefolder = "/Users/YourUser/somefolder/Integration" 
