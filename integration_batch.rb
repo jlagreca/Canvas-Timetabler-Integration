@@ -9,20 +9,26 @@ require 'json'
 require 'unirest'
 require 'zip'
 
-#you need to have folders for archive, data, csv, student and upload
+
+
 
 #some variables to make it do stuff and things
-basefolder = "/Users/YourUser/somefolder/Integration" 
 access_token = ""
-domain = "" #subdomain only
-env = nil 
+domain = ""
+env = "" 
+term_id = "" #this is the CANVAS Term_ID not the SIS_ID
+basefolder = "" # eg. /Users/jlagreca/Dropbox/canvas/clients/SomeCustomer/Integration
+
+
+
+
 #dont touch this stuff. 
 
-
 time = Time.now.to_i
+output_filename = "upload/enrolment_upload_#{time}.csv"
 source_folder = "upload"
 archive_folder = "archive"
-output_filename = "upload/enrolment_upload_#{time}.csv"
+
 
 def deep_remove!(text, array)
   array.delete_if do |value|
@@ -91,8 +97,8 @@ FileUtils.rm_rf(Dir.glob('csv/*'))
 #push
 env ? env << "." : env
 test_url = "https://#{domain}.#{env}instructure.com/api/v1/accounts/self"
-endpoint_url = "#{test_url}/sis_imports.json?import_type=instructure_csv"
-
+endpoint_url = "#{test_url}/sis_imports.json?batch_mode=1&batch_mode_term_id=#{term_id}&import_type=instructure_csv"
+puts endpoint_url
 test = Unirest.get(test_url, headers: { "Authorization" => "Bearer #{access_token}" })
 
 unless test.code == 200
@@ -136,7 +142,9 @@ upload = Unirest.post(endpoint_url,
 		"Authorization" => "Bearer #{access_token}"
   },
 	parameters: {
-		attachment: File.new(zipfile_name, "r")
+		attachment: File.new(zipfile_name, "r"),
+
+		
 	}
 )
 job = upload.body
